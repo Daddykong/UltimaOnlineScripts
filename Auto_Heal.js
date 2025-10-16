@@ -1,4 +1,5 @@
 //TODO: Add poisoning check and fix, maybe curse check and fix?
+//TODO: Add check to make sure you are not already casting.
 
 while (true) {
   const bandageType = 0xe21;
