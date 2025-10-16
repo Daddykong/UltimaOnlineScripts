@@ -3,3 +3,6 @@ Scripts for Ultima Online web client automation. Seems like they are all behind 
 
 ## [Auto Heal](Auto_Heal.js)
 Checks player health and heals depending on skill and criteria. Default is 80% health for bandage heal and 60% for Greater Heal/Close Wounds.
+
+## [Auto Miner](Auto_Miner.js)
+Attempts to mine an area around the player and move to new areas of the right tile types. Checks for pickaxes and tinkering tools/ingots to make and equip one if you don't already have one.
