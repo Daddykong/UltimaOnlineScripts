@@ -1,6 +1,6 @@
-let pet_ser = 0xB1B2167
+let pet_ser = 0xC3D5F1C
 let pet = client.findObject(pet_ser);
-let delay = 3000 //Casting delay, tune to  your casting speed
+let delay = 2500 //Casting delay, tune to  your casting speed
 let skip = true; //skip bandages and only use magic
 if (pet) {
   client.headMsg("Pet Heal Activated", pet.serial)
@@ -30,7 +30,7 @@ while (true) {
   if (player.inWarMode) { continue; }
 
   //Are we low on mana?
-  if (player.mana < player.maxMana * .7) { continue; }
+  if (player.mana < player.maxMana * .8) { continue; }
 
   //Player skills
   let vet = player.getSkill(Skills.Veterinary).value;
@@ -43,12 +43,12 @@ while (true) {
   console.log(`Banages serial: ${bandages.serial}`);
 
   //If poisoned handle that first
-  if (pet.isPoisoned) {
+  if (pet.isPoisoned && !pet.isDead) {
     if (magic > 80) {
       player.cast(Spells.Cure);
       sleep(delay); //Wait for targeting
       target.entity(pet);
-      sleep(1200); //Spell cooldown
+      sleep(500); //Spell cooldown
     }
   }
 
@@ -62,18 +62,18 @@ while (true) {
         sleep(4000) //Heals take 6 seconds but we also cooldown at the end of this loop
       }
     }
-    if (magic > 80) {
+    if (magic > 80 && !pet.isDead) {
       player.cast(Spells.GreaterHeal);
       sleep(delay)
       target.entity(pet);
       client.headMsg('Greater Heal', pet.serial);
     }
-    if (chiv > 50) {
+    if (chiv > 50 && !pet.isDead) {
       player.cast(Spells.CloseWounds);
       sleep(delay);
       target.entity(pet);
       client.headMsg('Close Wounds', pet.serial);
     }
   }
-  sleep(1200); //Casting cool down
+  sleep(1000); //Casting cool down
 }
