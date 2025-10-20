@@ -21,7 +21,7 @@ while (true) {
   //Are we moving?
   let start_x = player.x;
   let start_y = player.y;
-  sleep(500);
+  sleep(1000);
   let moving = start_x - player.x != 0 || start_y - player.y != 0;
   console.log(`Is Moving: ${moving}`);
   if (moving) { continue; }
@@ -29,8 +29,10 @@ while (true) {
   //Are we actively fighting?
   if (player.inWarMode) { continue; }
 
+  if (player.isHidden) { continue; }
+
   //Are we low on mana?
-  if (player.mana < player.maxMana * .8) { continue; }
+  if (player.mana < player.maxMana * .7) { continue; }
 
   //Player skills
   let vet = player.getSkill(Skills.Veterinary).value;
@@ -40,7 +42,7 @@ while (true) {
   //Check inventory for bandages, 2 levels deep
   const bandageType = 0xe21;
   const bandages = client.findType(bandageType, null, null, null, 2);
-  console.log(`Banages serial: ${bandages.serial}`);
+  console.log(`Banadges serial: ${bandages.serial}`);
 
   //If poisoned handle that first
   if (pet.isPoisoned && !pet.isDead) {
@@ -53,7 +55,7 @@ while (true) {
   }
 
   //Do we need healing and are we next to each other?
-  if (pet.hits <= pet.maxHits * .8 || pet.isDead) {
+  if (pet.hits <= pet.maxHits * .9 || pet.isDead) {
     if (vet > 50 && bandages && x_dist < 3 && y_dist < 3) {
       if (!skip || pet.isDead) {
         player.use(bandages);
