@@ -1,7 +1,3 @@
-//Simple script to log as you walk around. By default it dumps logs
-//as they are collected. Change the search radius and dump variables
-//to adjust to  your needs. Change the axe to be your specific axe.
-
 const TREES = [
     //New Haven area
     0x0CD9, //Tall pines
@@ -19,8 +15,7 @@ const TREES = [
 ];
 const WOOD = 0x1BDD; //All wood is the same type just different hues
 const SEARCH_RADIUS = 2;
-const DUMP = true; //drop logs if true, not stacked just dropped.
-const axe = client.findType(0xF49); //change me
+const DUMP = true;
 
 while (true) {
     const playerX = player.x;
@@ -43,6 +38,7 @@ while (true) {
     //console.log(local_trees);
 
     for (const tree of local_trees) {
+        let axe = client.findType(0xF49);
         player.use(axe)
         sleep(500);
         target.terrain(tree.x, tree.y, tree.z, tree.graphic)
