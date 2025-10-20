@@ -1,5 +1,10 @@
 let pet_ser = 0xB1B2167
 let pet = client.findObject(pet_ser);
+let delay = 3000 //Casting delay, tune to  your casting speed
+let skip = true; //skip bandages and only use magic
+if (pet) {
+  client.headMsg("Pet Heal Activated", pet.serial)
+}
 
 while (true) {
   //Is our pet even around?
@@ -20,6 +25,13 @@ while (true) {
   let moving = start_x - player.x != 0 || start_y - player.y != 0;
   console.log(`Is Moving: ${moving}`);
   if (moving) { continue; }
+
+  //Are we actively fighting?
+  if (player.inWarMode) { continue; }
+
+  //Are we low on mana?
+  if (player.mana < player.maxMana * .7) { continue; }
+
   //Player skills
   let vet = player.getSkill(Skills.Veterinary).value;
   let magic = player.getSkill(Skills.Magery).value;
@@ -34,29 +46,31 @@ while (true) {
   if (pet.isPoisoned) {
     if (magic > 80) {
       player.cast(Spells.Cure);
-      sleep(3500); //Wait for targeting
+      sleep(delay); //Wait for targeting
       target.entity(pet);
       sleep(1200); //Spell cooldown
     }
   }
 
   //Do we need healing and are we next to each other?
-  if (pet.hits <= pet.maxHits * .7 || pet.isDead) {
+  if (pet.hits <= pet.maxHits * .8 || pet.isDead) {
     if (vet > 50 && bandages && x_dist < 3 && y_dist < 3) {
-      player.use(bandages);
-      target.entity(pet);
-      client.headMsg('Bandage Heal', pet.serial);
-      sleep(4000) //Heals take 6 seconds but we also cooldown at the end of this loop
+      if (!skip || pet.isDead) {
+        player.use(bandages);
+        target.entity(pet);
+        client.headMsg('Bandage Heal', pet.serial);
+        sleep(4000) //Heals take 6 seconds but we also cooldown at the end of this loop
+      }
     }
     if (magic > 80) {
       player.cast(Spells.GreaterHeal);
-      sleep(3500)
+      sleep(delay)
       target.entity(pet);
       client.headMsg('Greater Heal', pet.serial);
     }
     if (chiv > 50) {
       player.cast(Spells.CloseWounds);
-      sleep(3500);
+      sleep(delay);
       target.entity(pet);
       client.headMsg('Close Wounds', pet.serial);
     }
