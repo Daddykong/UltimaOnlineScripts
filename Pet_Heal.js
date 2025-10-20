@@ -29,8 +29,6 @@ while (true) {
   //Are we actively fighting?
   if (player.inWarMode) { continue; }
 
-  if (player.isHidden) { continue; }
-
   //Are we low on mana?
   if (player.mana < player.maxMana * .7) { continue; }
 
@@ -65,14 +63,14 @@ while (true) {
         sleep(4000) //Heals take 6 seconds but we also cooldown at the end of this loop
       }
     }
-    if (magic > 80 && !pet.isDead) {
+    if (magic > 80 && !pet.isDead && !player.isHidden) {
       player.cast(Spells.GreaterHeal);
       sleep(delay)
       target.entity(pet);
       client.headMsg('Greater Heal', pet.serial);
     }
     if (chiv > 50 && !pet.isDead) {
-      player.cast(Spells.CloseWounds);
+      player.cast(Spells.CloseWounds && !player.isHidden);
       sleep(delay);
       target.entity(pet);
       client.headMsg('Close Wounds', pet.serial);
