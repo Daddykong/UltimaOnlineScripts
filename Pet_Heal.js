@@ -57,6 +57,7 @@ while (true) {
     if (vet > 50 && bandages && x_dist < 3 && y_dist < 3) {
       if (!skip || pet.isDead) {
         player.use(bandages);
+        sleep(300);
         target.entity(pet);
         client.headMsg('Bandage Heal', pet.serial);
         sleep(4000) //Heals take 6 seconds but we also cooldown at the end of this loop
