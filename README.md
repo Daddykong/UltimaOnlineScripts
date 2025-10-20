@@ -4,5 +4,11 @@ Scripts for Ultima Online web client automation. Seems like they are all behind 
 ## [Auto Heal](Auto_Heal.js)
 Checks player health and heals depending on skill and criteria. Default is 80% health for bandage heal and 60% for Greater Heal/Close Wounds.
 
+## [Pet Heal](Pet_Heal.js)
+Auto heals you pet as long as you aren't moving and are in range with the right resources/skills.
+
 ## [Auto Miner](Auto_Miner.js)
-Attempts to mine an area around the player and move to new areas of the right tile types. Checks for pickaxes and tinkering tools/ingots to make and equip one if you don't already have one.
+Attempts to mine an area around the player and smelt it on the back of a fire beetle. Checks for a pixaxe and equips it, makes one if you don't have one but have tools/resources.
+
+## [Auto Logger](Auto_logger.js)
+Chops wood and drops it on the ground. Assumes you have an axe equiped and doesn't stack the piles. This for looking for amber/bark/etc.
