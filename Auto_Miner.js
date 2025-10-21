@@ -1,98 +1,56 @@
-// ============================================================================
-// CONFIGURATION: Replace these values with your shard's graphic IDs
-// ============================================================================
-const EXCEPTIONAL_PICKAXE_ID = 0x0E86;
-const TINKERING_TOOLS_ID = 0x1EB8;
-const INGOT_ID = 0x1BF2;    // Basic Iron Ingots
-const ORE_IDS = [0x19B8, 0x19B9, 0x19BA];
-const MINABLE_TILE_IDS = [
-    0x053B, 0x023B, 0x00DE, 0x022D, 0x022E, 0x022F,
-    0x0236, 0x00E3 
-];
-const FORGE_TILE_IDS = [0x0FB1, 0x0FB2];
-const RECALL_RUNE_ID = 0x1F14; // Example graphic ID for a recall rune
-const MAX_MOVE_ATTEMPTS = 5;
-const SEARCH_RADIUS = 2;
+let pet_ser = 0xC27A95F
+let pet = client.findObject(pet_ser);
 
-let miningLocation = null;
-let isMoving = false;
-let moveAttempts = 0;
-
-async function stepOneCheckEquipment() {
-    // Check for pickaxe
-    const pickaxe = client.findType(
-        EXCEPTIONAL_PICKAXE_ID,
-        null,
-        player.backpack,
-        null,
-        2
-    )
-    if (pickaxe) {
-        let in_hand = player.equippedItems.oneHanded || player.equippedItems.twoHanded;
-        if (in_hand) {
-            player.moveItem(in_hand, player.backpack)
+async function smelt(pet) {
+    let ore_list = [0x19B9, 0x19B7, 0x19BA, 0x19B8];
+    for (let ore_type of ore_list) {
+        let ore = client.findAllItemsOfType(ore_type, null, player.backpack);
+        for (let pile of ore) {
+            player.use(pile);
+            sleep(300);
+            target.entity(pet);
         }
-        if (!player.equippedItems.oneHanded && !player.equippedItems.twoHanded) {
-            player.equip(pickaxe);
-            await sleep(1500); // Wait for equip animation
-        }
-    } else {
-        client.sysMsg("No pickaxe found. Checking for ingots and tools to make one...", 44);
-        const tinkeringTools = client.findType(
-            TINKERING_TOOLS_ID,
-            null,
-            player.backpack,
-            null,
-            2
-        );
-        const ingots = client.findType(
-            INGOT_ID,
-            null,
-            player.backpack,
-            null,
-            2
-        );
-        if (tinkeringTools && ingots && ingots.amount >= 20) {
-            await makePickaxeAndEquip(tinkeringTools, ingots);
-        } else {
-            client.sysMsg("Cannot make a new pickaxe. Ingots or tools missing.", 33);
-            await sleep(5000);
+    }
+}
+async function drop() {
+    let ore_list = [0x19B7, 0x19BA, 0x19B8];
+    for (let ore_type of ore_list) {
+        let ore = client.findAllItemsOfType(ore_type, null, player.backpack);
+        for (let pile of ore) {
+            player.moveItemOnGroundOffset(pile, 1, 0, 0);
         }
     }
 }
 
-async function makePickaxeAndEquip(tools, ingots) {
-    player.use(tools);
-    const gump = Gump.findOrWait("Tinkering Menu", 1500);
-    if (gump.exists && gump.hasButton(322)) {
-        gump.reply(322)
-    }
-    // After crafting, re-run equip check
-    await stepOneCheckEquipment();
-}
 
-async function stepTwoFindMiningSpots() {
-    let bestSpot = null;
-    let bestDistance = Infinity;
-    const playerX = player.x;
-    const playerY = player.y;
-    const playerZ = player.z
-    const local_minable = [];
-
-    for (let x = playerX - SEARCH_RADIUS; x <= playerX + SEARCH_RADIUS; x++) {
-        for (let y = playerY - SEARCH_RADIUS; y <= playerY + SEARCH_RADIUS; y++) {
-            const terrainTiles = client.getTerrainList(x, y);
-            if (terrainTiles && terrainTiles.length > 0) {
-                for (const tile of terrainTiles) {
-                    if (MINABLE_TILE_IDS.includes(tile.graphic) && Math.abs(tile.z - playerZ) < 5) {
-                        local_minable.push(tile);
-                    }
-                }
-            }
-        }
+let max_weight = player.weightMax;
+let current_weight = player.weight;
+let stripped = false;
+while (current_weight < max_weight && !stripped) {
+    let now = new Date().getSeconds();
+    var x = player.x;
+    var y = player.y;
+    var z = player.z;
+    let terrains = [0x53F, 0x53E, 0x53D, 0x53C, 0x53B];
+    for (let terrain of terrains) {
+        player.useItemInHand();
+        sleep(300);
+        target.terrain(x, y, z, terrain);
+        //sleep(300);
     }
-    return local_minable;
-}
-//You dig some
-//You have found
-//There is no metal
+    if (current_weight > max_weight * .8) {
+        smelt(pet);
+        sleep(300);
+        drop();
+        sleep(300);
+    }
+    current_weight = player.weight;
+    stripped = journal.containsText("There is no metal");
+    if (stripped) {
+        client.headMsg("All gone", player.serial);
+        journal.clear();
+    }
+    let queue = journal.containsText("too many objects");
+    sleep(1000);
+    journal.clear();
+};
