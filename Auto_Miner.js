@@ -1,5 +1,6 @@
 let pet_ser = 0xC27A95F
 let pet = client.findObject(pet_ser);
+let in_dungeon = true;
 
 async function smelt(pet) {
     let ore_list = [0x19B9, 0x19B7, 0x19BA, 0x19B8];
@@ -22,6 +23,7 @@ async function drop() {
     }
 }
 
+journal.clear();
 
 let max_weight = player.weightMax;
 let current_weight = player.weight;
@@ -31,12 +33,15 @@ while (current_weight < max_weight && !stripped) {
     var x = player.x;
     var y = player.y;
     var z = player.z;
-    let terrains = [0x53F, 0x53E, 0x53D, 0x53C, 0x53B];
+    let terrains = client.getTerrainList(x, y);
     for (let terrain of terrains) {
         player.useItemInHand();
         sleep(300);
-        target.terrain(x, y, z, terrain);
-        //sleep(300);
+        if (!in_dungeon) {
+            target.terrain(x, y, z, terrain.graphic);
+        } else {
+            target.terrain(x, y, z);
+        }
     }
     if (current_weight > max_weight * .8) {
         smelt(pet);
@@ -47,10 +52,9 @@ while (current_weight < max_weight && !stripped) {
     current_weight = player.weight;
     stripped = journal.containsText("There is no metal");
     if (stripped) {
+        smelt(pet);
         client.headMsg("All gone", player.serial);
         journal.clear();
     }
-    let queue = journal.containsText("too many objects");
-    sleep(1000);
-    journal.clear();
+    sleep(300);
 };
