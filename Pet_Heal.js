@@ -1,7 +1,8 @@
 let pet_ser = 0xC3D5F1C
 let pet = client.findObject(pet_ser);
 let delay = 2500 //Casting delay, tune to  your casting speed
-let skip = true; //skip bandages and only use magic
+let skip_band = false; //skip bandages and only use magic
+let skip_mag = false;
 if (pet) {
   client.headMsg("Pet Heal Activated", pet.serial)
 }
@@ -55,7 +56,7 @@ while (true) {
   //Do we need healing and are we next to each other?
   if (pet.hits <= pet.maxHits * .9 || pet.isDead) {
     if (vet > 50 && bandages && x_dist < 3 && y_dist < 3) {
-      if (!skip || pet.isDead) {
+      if (!skip_band || pet.isDead) {
         player.use(bandages);
         sleep(300);
         target.entity(pet);
@@ -63,14 +64,14 @@ while (true) {
         sleep(4000) //Heals take 6 seconds but we also cooldown at the end of this loop
       }
     }
-    if (magic > 80 && !pet.isDead && !player.isHidden) {
+    if (magic > 80 && !pet.isDead && !player.isHidden && !skip_mag) {
       player.cast(Spells.GreaterHeal);
       sleep(delay)
       target.entity(pet);
       client.headMsg('Greater Heal', pet.serial);
     }
-    if (chiv > 50 && !pet.isDead) {
-      player.cast(Spells.CloseWounds && !player.isHidden);
+    if (chiv > 50 && !pet.isDead && !player.isHidden && !skip_mag) {
+      player.cast(Spells.CloseWounds);
       sleep(delay);
       target.entity(pet);
       client.headMsg('Close Wounds', pet.serial);
