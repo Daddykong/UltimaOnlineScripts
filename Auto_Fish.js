@@ -1,4 +1,7 @@
 let junk_bin = 0x4124925D;
+let knife = 0x4023E271;
+const DUMP = false;
+const CUT = true;
 
 let start_inv = [];
 for (const i of (player.backpack.contents){
@@ -19,14 +22,21 @@ while (true) {
       new_items.push(i);
     }
   }
-  if (journal.containsText("Chest!")) {
-    console.log("Got Chest");
+  if (journal.containsText("Chest!") || journal.containsText("bitting")) {
+    client.headMsg("Stopped Fishgin", player.serial);
     break;
   }
   sleep(1000);
   console.log(new_items)
   for (const i of new_items) {
-    player.moveItem(i, junk_bin);
+    if (DUMP) {
+      player.moveItem(i, junk_bin);
+    }
+    if (CUT) {
+      player.use(knife);
+      sleep(300);
+      target.entity(i);
+    }
   }
   sleep(500);
 }
