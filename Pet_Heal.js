@@ -1,4 +1,4 @@
-let pets = [0xC5CCD7A, 0xC27A95F, 0xC43C8CD, 0xBB7DD89] //list pet serials here
+let pets = [0xC5CCD7A, 0xC27A95F, 0xC43C8CD, 0xBB7DD89]
 
 let pet = null;
 for (let i of pets) {
@@ -40,13 +40,14 @@ while (true && pet) {
   //Are we actively fighting?
   if (player.inWarMode) { continue; }
 
+  //Are we hidden?
+  if (player.isHidden) { continue; }
+
   //Player skills
   let vet = player.getSkill(Skills.Veterinary).value;
   let magic = player.getSkill(Skills.Magery).value;
-  let chiv = player.getSkill(Skills.Chivalry);
-  //Are we low on mana?
-  if (player.mana < player.maxMana * .7 && (magic > 80 || chiv > 50) && !skip_mag) { continue; };
-
+  let chiv = player.getSkill(Skills.Chivalry).value;
+ 
   //Check inventory for bandages, 2 levels deep
   const bandageType = 0xe21;
   const bandages = client.findType(bandageType, null, null, null, 2);
@@ -63,23 +64,28 @@ while (true && pet) {
   }
 
   //Do we need healing and are we next to each other?
-  if (pet.hits <= pet.maxHits * .95 || pet.isDead) {
+  let magic_threshold = pet.hits <= pet.maxHits * .95;
+  let band_threshold = pet.hits <= pet.maxHits * .8;
+  let min_mana = player.mana < player.maxMana * .5;
+  if ( magic_threshold || pet.isDead) {
     if (vet > 50 && bandages && x_dist < 3 && y_dist < 3) {
-      if (!skip_band || pet.isDead) {
+      if ((!skip_band && band_threshold) || pet.isDead) {
         player.use(bandages);
         sleep(300);
         target.entity(pet);
         client.headMsg('Bandage Heal', pet.serial);
-        sleep(4000) //Heals take 6 seconds but we also cooldown at the end of this loop
+        if (min_mana) { sleep(3000); }
       }
     }
-    if (magic > 80 && !pet.isDead && !player.isHidden && !skip_mag) {
+     //Are we low on mana?
+    if (min_mana) { continue; };
+    if (magic > 80 && !pet.isDead && !skip_mag && !player.equippedItems.mount) {
       player.cast(Spells.GreaterHeal);
       sleep(delay)
       target.entity(pet);
       client.headMsg('Greater Heal', pet.serial);
     }
-    if (chiv > 50 && !pet.isDead && !player.isHidden && !skip_mag) {
+    if (chiv > 50 && !pet.isDead && !skip_mag) {
       player.cast(Spells.CloseWounds);
       sleep(delay);
       target.entity(pet);
