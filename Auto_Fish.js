@@ -32,15 +32,13 @@ while (true) {
     y = getRandomInt(MIN, MAX); 
   }
 
-  if (journal.containsText("seen")) {
-    continue;
+  if (journal.containsText("seen") && !RANDO) {
+    break;
   }
-  if (journal.containsText("biting")) {
-    target.terrainWithOffset(x, y, 0);
+  if (journal.containsText("biting") && !RANDO) {
+    break;
   }
-  if (!journal.containsText("pull out") && !journal.containsText("fail")) {
-    target.terrainWithOffset(x, y, 0)
-  }
+  target.terrainWithOffset(x, y, 0);
   journal.clear();
   sleep(6000);
 
