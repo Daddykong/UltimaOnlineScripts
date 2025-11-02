@@ -1,7 +1,16 @@
-let junk_bin = 0x4124925D;
+let junk_bin = 0x4071EB27;
 let knife = 0x4023E271;
-const DUMP = false;
+const MIN = -10;
+const MAX = 10
+const DUMP = true;
 const CUT = true;
+const RANDO = false;
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 let start_inv = [];
 for (const i of (player.backpack.contents){
@@ -13,8 +22,27 @@ while (true) {
   journal.clear();
   player.useItemInHand();
   sleep(300);
-  target.terrainWithOffset(0, 10, 0);
-  sleep(9000);
+
+  //player offset
+  let x = 0;
+  let y = 10;
+
+  if (RANDO) {
+    x = getRandomInt(MIN, MAX);
+    y = getRandomInt(MIN, MAX); 
+  }
+
+  if (journal.containsText("seen")) {
+    continue;
+  }
+  if (journal.containsText("biting")) {
+    target.terrainWithOffset(x, y, 0);
+  }
+  if (!journal.containsText("pull out") && !journal.containsText("fail")) {
+    target.terrainWithOffset(x, y, 0)
+  }
+  journal.clear();
+  sleep(6000);
 
   let new_items = [];
   for (const i of player.backpack.contents) {
@@ -23,18 +51,17 @@ while (true) {
     }
   }
   if (journal.containsText("Chest!") || journal.containsText("bitting")) {
-    client.headMsg("Stopped Fishgin", player.serial);
+    client.headMsg("Stopped Fishing", player.serial);
     break;
   }
-  sleep(1000);
-  console.log(new_items)
+  //sleep(1000);
   for (const i of new_items) {
     if (DUMP) {
       player.moveItem(i, junk_bin);
     }
     if (CUT) {
       player.use(knife);
-      sleep(300);
+      sleep(500);
       target.entity(i);
     }
   }
