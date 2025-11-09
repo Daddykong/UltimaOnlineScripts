@@ -1,8 +1,4 @@
-//let pet_ser = 0xC5CCD7A; // Silas
-//let pet_ser = 0xC27A95F; // BuggySpice
-//let pet_ser = ; //Wyrmwood
-//let pet_ser = 0xC43C8CD; // Sue
-//let pet_ser = 0xBB7DD89; // RixRox
+
 let pets = [
   0xC5CCD7A, //Silas
   0xC27A95F, //BuggySpice
